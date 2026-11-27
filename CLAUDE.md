@@ -50,7 +50,7 @@ src/
   theme.ts         # ALL colours, sizes, fonts, spacing, timings
   game/            # pure game logic — NO Phaser imports
   schemas/         # Zod schemas + inferred types
-  scenes/          # Phaser scenes (Menu, Placement, PassDevice, Battle, GameOver)
+  scenes/          # Phaser scenes (Menu, Placement, Battle, GameOver)
   view/            # small render helpers (drawCell, drawPeg, drawShip, ...)
 tests/             # or co-located *.test.ts next to the code
 public/            # static assets (none required for v1)

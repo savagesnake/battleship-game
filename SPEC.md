@@ -12,12 +12,13 @@ This is a rebuild of the earlier [simple-battleship](https://github.com/savagesn
 
 ## 2. Game modes
 
-| Mode | Description |
-|---|---|
-| **vs Computer** | One human against a computer opponent. |
-| **vs Player (hot-seat)** | Two humans on the same device, taking turns. A "pass the device" screen hides each player's fleet between turns. |
+| Mode | Status | Description |
+|---|---|---|
+| **vs Computer** | **v1** | One human against a computer opponent. |
+| **vs Player (online)** | Planned, after v1 | Two humans, each on their own device, joined by a room code or link. Not built in v1. |
 
-Online multiplayer is out of scope for v1.
+- Hot-seat (two players sharing one device) is dropped. vs Player will be online instead.
+- v1 must not build any vs Player UI. The game logic must still be structured so online play can be added later without rewriting `src/game/` (see §9.1).
 
 ## 3. Board
 
@@ -61,7 +62,7 @@ Total: 17 cells per fleet.
 
 ### 5.1 Turn order
 
-- Player 1 (or the human, in vs Computer) shoots first.
+- The human shoots first.
 - **A turn is exactly one shot, whether it hits or misses.** Then the turn passes to the opponent.
 - A player cannot shoot a cell they have already shot. Clicking it does nothing and does not use the turn.
 
@@ -93,11 +94,9 @@ Total: 17 cells per fleet.
 
 ## 7. Screens / flow
 
-1. **Main menu** — choose *vs Computer* or *vs Player*.
-2. **Placement** — Player 1 places fleet. In hot-seat, a **Pass device** screen follows, then Player 2 places.
-3. **Battle** — target grid on top, ocean grid below, status message area, whose-turn indicator.
-   - In hot-seat, after each shot shows its result, a **Pass device** screen hides both boards until the next player clicks "I'm ready".
-4. **Game over** — winner, stats, Play again / Main menu.
+1. **Main menu** — start a *vs Computer* game (the only mode in v1; see §2).
+2. **Placement** — the human places their fleet; the computer places its fleet randomly.
+3. **Battle** — target grid on top, ocean grid below, status message area, whose-turn indicator.4. **Game over** — winner, stats, Play again / Main menu.
 
 ## 8. Visuals and theming
 
@@ -126,9 +125,17 @@ Default v1 palette (placeholder, to be replaced):
 
 - **`src/game/`** — pure TypeScript game logic, no Phaser: board model, placement validation, shot resolution, sunk/win detection, AI.
 - **`src/schemas/`** — Zod schemas for core data (coordinate, ship, placement, shot, game state). Used to validate state at boundaries (e.g. loading saved state, debug input).
-- **`src/scenes/`** — Phaser scenes: `Menu`, `Placement`, `PassDevice`, `Battle`, `GameOver`.
+- **`src/scenes/`** — Phaser scenes: `Menu`, `Placement`, `Battle`, `GameOver`.
 - **`src/theme.ts`** — visual tokens (§8).
 - State changes go through pure functions like `placeShip(board, ship) → board | error` and `fireShot(state, coord) → { state, result }`.
+
+### 9.1 Online-ready state
+
+v1 is vs Computer only, but the state model must let online vs Player (§2) reuse `src/game/` unchanged:
+
+- **Per-player state.** Each player's fleet and shots live in a separate `PlayerState`, not in one shared board.
+- **Per-player view.** A pure `viewFor(state, player)` returns only what that player may see: their own fleet, their own shots, hits and misses against them, and enemy ships once sunk. Scenes render this view, never the raw game state.
+- **Moves as actions.** Player moves are serializable actions defined as Zod schemas (`placeFleet`, `fire`) and applied by one pure `applyAction(state, action) → { state, result } | error`. The computer opponent submits its moves through the same path as the human.
 
 ## 10. Tech stack
 
@@ -152,14 +159,17 @@ Anything beyond this list needs a clear reason and approval first (see CLAUDE.md
   - turn passing after every shot
   - win detection
   - AI: never repeats a cell; targets neighbours after a hit (seeded random)
+  - `viewFor`: never exposes enemy ship positions until that ship is sunk
+  - `applyAction`: rejects a shot out of turn, a repeat shot, and any action after game over
+- Action schemas (`placeFleet`, `fire`): valid and invalid examples.
 - Phaser scenes are not unit-tested in v1; check them by playing.
 
 ## 12. Out of scope for v1
 
-Online multiplayer, accounts, sound/music, animations beyond simple feedback, custom grid sizes or fleets, "salvo" or other variant rules, mobile-specific layouts (should still be usable with a mouse/touch on a reasonably sized screen), persistence between sessions.
+Online multiplayer (planned after v1, see §2), hot-seat / same-device two-player, accounts, sound/music, animations beyond simple feedback, custom grid sizes or fleets, "salvo" or other variant rules, mobile-specific layouts (should still be usable with a mouse/touch on a reasonably sized screen), persistence between sessions.
 
 ## 13. Open questions
 
 - Should the computer have difficulty levels (e.g. Easy = pure random, Normal = hunt/target)?
-- Should hot-seat hide the result on the pass screen, or show "Hit — Cruiser" before handing over?
+- Which transport for online vs Player: a hosted realtime service, peer-to-peer WebRTC, or our own server? Decide before that work starts; it needs approval as a new dependency or service.
 - Keyboard-only shooting (type `B7`) in addition to clicking?
