@@ -9,18 +9,22 @@ export interface ButtonOptions {
   /** Small secondary line under the label, e.g. "Coming soon". */
   badge?: string | undefined;
   onClick?: (() => void) | undefined;
+  /** 'small' for the compact placement buttons. */
+  size?: 'normal' | 'small' | undefined;
 }
 
 /** Flat rectangle button. Disabled buttons are not interactive at all, so they can't feel half-working. */
 export function drawButton(scene: Phaser.Scene, options: ButtonOptions): Phaser.GameObjects.Container {
-  const { x, y, label, enabled, badge, onClick } = options;
+  const { x, y, label, enabled, badge, onClick, size = 'normal' } = options;
   const { colors, sizes, fonts } = theme;
+  const width = size === 'small' ? sizes.smallButtonWidth : sizes.buttonWidth;
+  const height = size === 'small' ? sizes.smallButtonHeight : sizes.buttonHeight;
 
   const background = scene.add.rectangle(
     0,
     0,
-    sizes.buttonWidth,
-    sizes.buttonHeight,
+    width,
+    height,
     enabled ? colors.buttonFill : colors.buttonFillDisabled,
   );
 
