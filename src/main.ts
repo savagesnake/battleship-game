@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 import { MenuScene } from './scenes/MenuScene';
+import { BattleScene } from './scenes/BattleScene';
 import { PlacementScene } from './scenes/PlacementScene';
-import { layout, theme } from './theme';
+import { theme } from './theme';
+import { layout } from './view/boardLayout';
 
 document.body.style.backgroundColor = `#${theme.colors.background.toString(16).padStart(6, '0')}`;
 
@@ -15,5 +17,5 @@ new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [MenuScene, PlacementScene],
+  scene: [MenuScene, PlacementScene, BattleScene],
 });

@@ -1,7 +1,5 @@
 // Single home for every visual token (SPEC §8). Placeholder v1 palette, meant to be replaced.
 
-export const BOARD_SIZE = 10;
-
 export const theme = {
   colors: {
     background: 0x0b1d2e,
@@ -21,6 +19,8 @@ export const theme = {
     buttonText: '#f2f2f2',
     buttonTextDisabled: '#5f7f9c',
     badge: '#e8b84a',
+    label: '#9cc3e6',
+    sectionTitle: '#f2f2f2',
   },
   sizes: {
     cellSize: 32,
@@ -29,6 +29,7 @@ export const theme = {
     labelGutter: 24,
     buttonWidth: 240,
     buttonHeight: 56,
+    shipInset: 4,
   },
   fonts: {
     family: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
@@ -37,6 +38,7 @@ export const theme = {
     labelSize: '14px',
     buttonSize: '20px',
     badgeSize: '12px',
+    sectionTitleSize: '16px',
   },
   spacing: {
     margin: 24,
@@ -44,21 +46,9 @@ export const theme = {
     statusHeight: 48,
     buttonGap: 16,
     titleGap: 48,
+    sectionTitleHeight: 28,
   },
   timings: {
     aiDelayMs: 600,
   },
 } as const;
-
-/** Canvas size derived from theme values, so changing cellSize reflows everything. */
-export function computeLayout(t: typeof theme = theme) {
-  const gridPixels = BOARD_SIZE * t.sizes.cellSize;
-  const gridWithLabels = gridPixels + t.sizes.labelGutter;
-  const width = gridWithLabels + t.spacing.margin * 2;
-  // Two stacked grids (target above, ocean below) plus a status bar.
-  const height =
-    t.spacing.margin * 2 + gridWithLabels * 2 + t.spacing.gridGap + t.spacing.statusHeight;
-  return { gridPixels, gridWithLabels, width, height };
-}
-
-export const layout = computeLayout();

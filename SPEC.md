@@ -129,6 +129,8 @@ Default v1 palette (placeholder, to be replaced):
 - **`src/schemas/`** — Zod schemas for core data (coordinate, ship, placement, shot, game state). Used to validate state at boundaries (e.g. loading saved state, debug input).
 - **`src/scenes/`** — Phaser scenes: `Menu`, `Placement`, `Battle`, `GameOver`.
 - **`src/theme.ts`** — visual tokens (§8).
+- **`src/view/`** — the only code that draws: `drawGrid`, `drawCell`, `drawShip`, `drawPeg`, `drawButton`. `boardLayout.ts` computes all positions (grid origins, cell ↔ pixel) from theme tokens.
+- **Board views** — `oceanBoard(view)` and `targetBoard(view)` in `src/game/boardCells.ts` turn a player's view into per-cell state and ship shapes; the target grid only ever includes sunk enemy ships.
 - State changes go through pure functions like `placeShip(board, ship) → board | error` and `fireShot(state, coord) → { state, result }`.
 
 ### 9.1 Online-ready state
