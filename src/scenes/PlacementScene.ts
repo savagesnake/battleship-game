@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
+import { DEMO_VIEW } from '../game/demoView';
 import { GameModeSchema, type GameMode } from '../schemas/gameMode';
-import { layout, theme } from '../theme';
+import { theme } from '../theme';
+import { layout } from '../view/boardLayout';
 import { drawButton } from '../view/drawButton';
 
 // Placeholder so the menu has somewhere to go; the real placement UI is SPEC §4.3.
@@ -42,9 +44,18 @@ export class PlacementScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
+    // Temporary: lets the board (§3) be checked until placement produces real state.
     drawButton(this, {
       x: centerX,
       y: centerY + sizes.buttonHeight,
+      label: 'Preview board',
+      enabled: true,
+      onClick: () => this.scene.start('Battle', { view: DEMO_VIEW }),
+    });
+
+    drawButton(this, {
+      x: centerX,
+      y: centerY + sizes.buttonHeight * 2 + spacing.buttonGap,
       label: 'Back to menu',
       enabled: true,
       onClick: () => this.scene.start('Menu'),

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_MODES } from '../game/modes';
-import { layout, theme } from '../theme';
+import { theme } from '../theme';
+import { layout } from '../view/boardLayout';
 import { drawButton } from '../view/drawButton';
 
 export class MenuScene extends Phaser.Scene {
