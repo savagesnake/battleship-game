@@ -1,12 +1,35 @@
 import { describe, expect, it } from 'vitest';
-import { FLEET, SHIP_LENGTH, shipCells } from './fleet';
+import type { PlacedShip, ShipName } from '../schemas/ship';
+import { DEMO_VIEW } from './demoView';
+import {
+  FLEET,
+  FLEET_CELL_COUNT,
+  FLEET_SIZE,
+  isCompleteFleet,
+  missingShips,
+  SHIP_LENGTH,
+  shipCells,
+} from './fleet';
+
+const at = (name: ShipName, row = 0): PlacedShip => ({ name, start: { row, col: 0 }, orientation: 'horizontal' });
+const fullFleet: PlacedShip[] = DEMO_VIEW.fleet;
 
 describe('FLEET', () => {
-  it('matches SPEC §4.1 (5 ships, 17 cells)', () => {
-    expect(FLEET.map((s) => s.name)).toEqual(['Carrier', 'Battleship', 'Cruiser', 'Submarine', 'Destroyer']);
-    expect(FLEET.reduce((sum, s) => sum + s.length, 0)).toBe(17);
+  it('matches SPEC §4.1 in order and length', () => {
+    expect(FLEET).toEqual([
+      { name: 'Carrier', length: 5 },
+      { name: 'Battleship', length: 4 },
+      { name: 'Cruiser', length: 3 },
+      { name: 'Submarine', length: 3 },
+      { name: 'Destroyer', length: 2 },
+    ]);
     expect(SHIP_LENGTH.Carrier).toBe(5);
     expect(SHIP_LENGTH.Destroyer).toBe(2);
+  });
+
+  it('has 5 ships covering 17 cells', () => {
+    expect(FLEET_SIZE).toBe(5);
+    expect(FLEET_CELL_COUNT).toBe(17);
   });
 });
 
@@ -30,5 +53,40 @@ describe('shipCells', () => {
     for (const { name, length } of FLEET) {
       expect(shipCells({ name, start: { row: 0, col: 0 }, orientation: 'vertical' })).toHaveLength(length);
     }
+  });
+});
+
+describe('missingShips', () => {
+  it('lists the whole fleet in order when nothing is placed', () => {
+    expect(missingShips([])).toEqual(['Carrier', 'Battleship', 'Cruiser', 'Submarine', 'Destroyer']);
+  });
+
+  it('lists only unplaced ships for a partial fleet', () => {
+    expect(missingShips([at('Cruiser'), at('Carrier', 2)])).toEqual(['Battleship', 'Submarine', 'Destroyer']);
+  });
+
+  it('is empty for a full fleet', () => {
+    expect(missingShips(fullFleet)).toEqual([]);
+  });
+});
+
+describe('isCompleteFleet', () => {
+  it('accepts a full fleet in any order', () => {
+    expect(isCompleteFleet(fullFleet)).toBe(true);
+    expect(isCompleteFleet([...fullFleet].reverse())).toBe(true);
+  });
+
+  it('rejects an empty or partial fleet', () => {
+    expect(isCompleteFleet([])).toBe(false);
+    expect(isCompleteFleet(fullFleet.slice(0, 4))).toBe(false);
+  });
+
+  it('rejects a duplicate standing in for a missing ship', () => {
+    const withTwoCruisers = fullFleet.map((ship) => (ship.name === 'Submarine' ? { ...ship, name: 'Cruiser' as const } : ship));
+    expect(isCompleteFleet(withTwoCruisers)).toBe(false);
+  });
+
+  it('rejects an extra ship', () => {
+    expect(isCompleteFleet([...fullFleet, at('Destroyer', 9)])).toBe(false);
   });
 });
