@@ -18,7 +18,8 @@ This is a rebuild of the earlier [simple-battleship](https://github.com/savagesn
 | **vs Player (online)** | Planned, after v1 | Two humans, each on their own device, joined by a room code or link. Not built in v1. |
 
 - Hot-seat (two players sharing one device) is dropped. vs Player will be online instead.
-- v1 must not build any vs Player UI. The game logic must still be structured so online play can be added later without rewriting `src/game/` (see §9.1).
+- The main menu lists vs Player as a disabled option labelled "Coming soon"; selecting it does nothing. No other vs Player UI is built in v1.
+- The game logic must still be structured so online play can be added later without rewriting `src/game/` (see §9.1).
 
 ## 3. Board
 
@@ -94,9 +95,10 @@ Total: 17 cells per fleet.
 
 ## 7. Screens / flow
 
-1. **Main menu** — start a *vs Computer* game (the only mode in v1; see §2).
+1. **Main menu** — title, a *vs Computer* button that starts Placement, and a disabled *vs Player — Coming soon* option (see §2).
 2. **Placement** — the human places their fleet; the computer places its fleet randomly.
-3. **Battle** — target grid on top, ocean grid below, status message area, whose-turn indicator.4. **Game over** — winner, stats, Play again / Main menu.
+3. **Battle** — target grid on top, ocean grid below, status message area, whose-turn indicator.
+4. **Game over** — winner, stats, Play again / Main menu.
 
 ## 8. Visuals and theming
 
