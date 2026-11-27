@@ -132,6 +132,7 @@ Default v1 palette (placeholder, to be replaced):
 - **`src/view/`** — the only code that draws: `drawGrid`, `drawCell`, `drawShip`, `drawPeg`, `drawButton`. `boardLayout.ts` computes all positions (grid origins, cell ↔ pixel) from theme tokens.
 - **Board views** — `oceanBoard(view)` and `targetBoard(view)` in `src/game/boardCells.ts` turn a player's view into per-cell state and ship shapes; the target grid only ever includes sunk enemy ships.
 - State changes go through pure functions like `placeShip(board, ship) → board | error` and `fireShot(state, coord) → { state, result }`.
+- **Randomness is injected** as a `Random` (`() => number` in [0, 1)) from `src/game/random.ts`. Scenes pass `Math.random`; tests pass `createSeededRandom(seed)`. Game code never calls `Math.random` itself.
 
 ### 9.1 Online-ready state
 

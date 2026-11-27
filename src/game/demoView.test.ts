@@ -3,6 +3,7 @@ import { PlayerViewSchema } from '../schemas/playerView';
 import { BOARD_SIZE } from './constants';
 import { DEMO_VIEW } from './demoView';
 import { FLEET, shipCells } from './fleet';
+import { isValidFleet } from './placement';
 import { isSunk } from './sunk';
 
 describe('DEMO_VIEW', () => {
@@ -14,6 +15,10 @@ describe('DEMO_VIEW', () => {
     expect(DEMO_VIEW.fleet.map((s) => s.name).sort()).toEqual(FLEET.map((s) => s.name).sort());
     const cells = [...DEMO_VIEW.fleet, ...DEMO_VIEW.sunkEnemyShips].flatMap(shipCells);
     expect(cells.every((c) => c.row < BOARD_SIZE && c.col < BOARD_SIZE)).toBe(true);
+  });
+
+  it('has a legally placed fleet', () => {
+    expect(isValidFleet(DEMO_VIEW.fleet)).toBe(true);
   });
 
   it('shows one sunk own ship and only sunk enemy ships', () => {
