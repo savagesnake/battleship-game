@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BOARD_SIZE } from '../game/constants';
 import { theme } from '../theme';
-import { cellAt, cellCenter, computeLayout, layout, type LayoutTokens } from './boardLayout';
+import { cellAt, cellCenter, computeLayout, layout, placementLayout, type LayoutTokens } from './boardLayout';
 
 const bottomOf = (grid: { originY: number }) => grid.originY + layout.gridPixels;
 
@@ -52,5 +52,39 @@ describe('cellCenter / cellAt', () => {
     expect(cellAt(g, g.originX + 1, g.originY - 1)).toBeNull();
     expect(cellAt(g, g.originX + layout.gridPixels, g.originY + 1)).toBeNull();
     expect(cellAt(g, g.originX + 1, g.originY + layout.gridPixels)).toBeNull();
+  });
+});
+
+describe('computePlacementLayout', () => {
+  const p = placementLayout;
+  const { smallButtonWidth: bw, smallButtonHeight: bh } = theme.sizes;
+
+  it('stacks grid, picker, buttons and hint without overlap', () => {
+    const gridBottom = p.grid.originY + layout.gridPixels;
+    const firstRow = p.pickerRows[0];
+    const lastRow = p.pickerRows[p.pickerRows.length - 1];
+    expect(firstRow && lastRow).toBeTruthy();
+    if (!firstRow || !lastRow) return;
+    expect(firstRow.y).toBeGreaterThan(gridBottom);
+    expect(p.buttons.rotate.y - bh / 2).toBeGreaterThan(lastRow.y + lastRow.height);
+    expect(p.hint.y).toBeGreaterThan(p.buttons.ready.y + bh / 2);
+  });
+
+  it('has one picker row per ship, stacked', () => {
+    expect(p.pickerRows).toHaveLength(5);
+    p.pickerRows.slice(1).forEach((row, i) => {
+      const prev = p.pickerRows[i];
+      if (prev) expect(row.y).toBe(prev.y + prev.height);
+    });
+  });
+
+  it('keeps the buttons side by side without touching and inside the grid width', () => {
+    expect(p.buttons.randomize.x - p.buttons.rotate.x).toBeGreaterThan(bw);
+    expect(p.buttons.rotate.x - bw / 2).toBeGreaterThanOrEqual(p.grid.originX);
+    expect(p.buttons.randomize.x + bw / 2).toBeLessThanOrEqual(p.grid.originX + layout.gridPixels);
+  });
+
+  it('fits inside the canvas', () => {
+    expect(p.hint.y).toBeLessThan(layout.height - theme.spacing.margin);
   });
 });

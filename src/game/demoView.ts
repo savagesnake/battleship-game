@@ -1,8 +1,8 @@
 import type { PlayerView } from '../schemas/playerView';
 
 /**
- * Fixed sample board so the Battle scene can be checked before Placement (§4) and shooting (§5) exist.
- * Remove once Battle receives real state.
+ * Fixed sample view used as a test fixture (a full valid fleet, hits, misses and sunk ships on both grids).
+ * Not used by the UI.
  */
 export const DEMO_VIEW: PlayerView = {
   fleet: [

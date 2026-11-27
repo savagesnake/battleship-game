@@ -58,6 +58,10 @@ Total: 17 cells per fleet.
 - A **Reset** button clears the board.
 - **Ready** is enabled only when all five ships are placed.
 - The computer always places its fleet randomly.
+- After a ship is placed, the next unplaced ship is selected automatically.
+- Selecting an already-placed ship in the list picks it back up off the board so it can be moved.
+- On touch screens (no hover), tapping a cell places the selected ship there; an invalid tap shows why in the hint line.
+- Pressing Ready creates the computer's fleet and hands both fleets to Battle.
 
 ## 5. Turns and shooting
 

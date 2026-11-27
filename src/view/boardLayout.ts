@@ -4,8 +4,21 @@ import { theme } from '../theme';
 
 /** The subset of theme tokens layout depends on, so tests can try other sizes. */
 export interface LayoutTokens {
-  sizes: { cellSize: number; labelGutter: number };
-  spacing: { margin: number; gridGap: number; sectionTitleHeight: number; statusHeight: number };
+  sizes: {
+    cellSize: number;
+    labelGutter: number;
+    pickerRowHeight: number;
+    smallButtonWidth: number;
+    smallButtonHeight: number;
+  };
+  spacing: {
+    margin: number;
+    gridGap: number;
+    sectionTitleHeight: number;
+    statusHeight: number;
+    sectionGap: number;
+    buttonGap: number;
+  };
 }
 
 export interface GridLayout {
@@ -79,3 +92,66 @@ export function cellAt(grid: GridLayout, x: number, y: number): Coord | null {
   if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) return null;
   return { row, col };
 }
+
+export interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface PlacementLayout {
+  grid: GridLayout;
+  /** One row per fleet ship, top to bottom. */
+  pickerRows: Rect[];
+  /** Centres of the 2×2 buttons: Rotate, Randomize, Reset, Ready. */
+  buttons: { rotate: Point; randomize: Point; reset: Point; ready: Point };
+  hint: Point;
+}
+
+export interface Point {
+  x: number;
+  y: number;
+}
+
+/**
+ * Placement screen (SPEC §4.3): the player's grid in the top slot, then the ship picker,
+ * a 2×2 block of buttons and a hint line. Uses the same canvas as Battle.
+ */
+export function computePlacementLayout(tokens: LayoutTokens = theme, shipCount = 5): PlacementLayout {
+  const base = computeLayout(tokens);
+  const { pickerRowHeight, smallButtonWidth, smallButtonHeight } = tokens.sizes;
+  const { sectionGap, buttonGap } = tokens.spacing;
+  const left = base.target.originX;
+  const width = base.gridPixels;
+
+  const pickerTop = base.target.originY + base.gridPixels + sectionGap;
+  const pickerRows = Array.from({ length: shipCount }, (_, i) => ({
+    x: left,
+    y: pickerTop + i * pickerRowHeight,
+    width,
+    height: pickerRowHeight,
+  }));
+
+  const buttonsTop = pickerTop + shipCount * pickerRowHeight + sectionGap;
+  const centre = left + width / 2;
+  const colX = [centre - (smallButtonWidth + buttonGap) / 2, centre + (smallButtonWidth + buttonGap) / 2] as const;
+  const rowY = [
+    buttonsTop + smallButtonHeight / 2,
+    buttonsTop + smallButtonHeight * 1.5 + buttonGap,
+  ] as const;
+
+  return {
+    grid: base.target,
+    pickerRows,
+    buttons: {
+      rotate: { x: colX[0], y: rowY[0] },
+      randomize: { x: colX[1], y: rowY[0] },
+      reset: { x: colX[0], y: rowY[1] },
+      ready: { x: colX[1], y: rowY[1] },
+    },
+    hint: { x: centre, y: buttonsTop + smallButtonHeight * 2 + buttonGap + sectionGap },
+  };
+}
+
+export const placementLayout = computePlacementLayout();

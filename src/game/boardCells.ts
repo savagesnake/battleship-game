@@ -51,3 +51,8 @@ export function targetBoard(view: PlayerView): BoardView {
   const ships = view.sunkEnemyShips.map((ship) => ({ ship, sunk: true }));
   return buildBoard(ships, view.outgoingShots);
 }
+
+/** View at the start of a battle (or during placement): own fleet, no shots yet. */
+export function startingView(fleet: readonly PlacedShip[]): PlayerView {
+  return { fleet: [...fleet], incomingShots: [], outgoingShots: [], sunkEnemyShips: [] };
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PlayerView } from '../schemas/playerView';
-import { oceanBoard, targetBoard } from './boardCells';
+import { oceanBoard, startingView, targetBoard } from './boardCells';
 
 const empty: PlayerView = { fleet: [], incomingShots: [], outgoingShots: [], sunkEnemyShips: [] };
 
@@ -76,5 +76,12 @@ describe('targetBoard', () => {
     expect(ships).toEqual([{ ship: sunkShip, sunk: true }]);
     expect(cells[0]?.[8]).toEqual({ ship: 'sunk', peg: 'hit' });
     expect(cells[0]?.[9]).toEqual({ ship: 'sunk', peg: 'hit' });
+  });
+});
+
+describe('startingView', () => {
+  it('has the fleet and no shots', () => {
+    const fleet = [{ name: 'Carrier', start: { row: 0, col: 0 }, orientation: 'horizontal' } as const];
+    expect(startingView(fleet)).toEqual({ fleet, incomingShots: [], outgoingShots: [], sunkEnemyShips: [] });
   });
 });
